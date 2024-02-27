@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Predictor</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* Add CSS styles for the header */
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #007BFF; /* You can change the background color */
+            color: #ffffff; /* You can change the text color */
+        }
+
+        h1 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Create a header with "Disease Predictor" centered -->
+    <header>
+        <h1>Disease Predictor</h1>
+    </header>
+
+    <form id="symptom-form">
+        <label for="symptoms">Select symptoms:</label>
+        <select multiple id="symptoms" name="symptoms" style="width: 100%;"></select>
+        <button type="submit">Predict</button>
+    </form>
+    <div id="results"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize the dropdown with symptoms
+            var symptoms = [
+                {% for symptom in symptoms %}
+                "{{ symptom }}",
+                {% endfor %}
+            ];
+            $('#symptoms').select2({
+                data: symptoms,
+                placeholder: "Select symptoms",
+                allowClear: true,
+                tags: true,
+                tokenSeparators: [',', ' ']
+            });
+
+            $('#symptom-form').submit(function (e) {
+                e.preventDefault();
+                var selectedSymptoms = $('#symptoms').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/predict',
+                    data: { 'symptoms': selectedSymptoms },
+                    success: function (data) {
+                        $('#results').html(data);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
